@@ -1,522 +1,749 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>耐え抜くカレンダー</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="./icon-512.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="./icon-512.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <style>
-        .x-draw {
-            transition: transform 1.2s ease-out, opacity 1.2s ease-out;
-        }
-        .no-select {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
+      .x-draw {
+        transition:
+          transform 1.2s ease-out,
+          opacity 1.2s ease-out;
+      }
+      .no-select {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
     </style>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-select font-sans">
-
-    <div id="debug-banner" class="hidden bg-amber-600 text-slate-900 text-center text-xs font-bold py-1 tracking-wider">
-        🛠️ デバッグモード（タップでON/OFF・即時APIテスト）
+  </head>
+  <body
+    class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-select font-sans"
+  >
+    <div
+      id="debug-banner"
+      class="hidden bg-amber-600 text-slate-900 text-center text-xs font-bold py-1 tracking-wider"
+    >
+      🛠️ デバッグモード（タップでON/OFF・即時APIテスト）
     </div>
 
-    <header class="p-6 text-center border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-10">
-        <h1 id="event-title" class="text-xl font-bold text-slate-400 mb-1">目標を設定してください</h1>
-        <div class="text-4xl font-extrabold text-rose-500 tracking-wider">
-            あと <span id="countdown-days" class="text-5xl text-white">--</span> 日
-        </div>
+    <header
+      class="p-6 text-center border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-10"
+    >
+      <h1 id="event-title" class="text-xl font-bold text-slate-400 mb-1">
+        目標を設定してください
+      </h1>
+      <div class="text-4xl font-extrabold text-rose-500 tracking-wider">
+        あと <span id="countdown-days" class="text-5xl text-white">--</span> 日
+      </div>
     </header>
 
-    <main class="flex-1 p-4 max-w-md mx-auto w-full flex flex-col justify-between gap-6">
-        
-        <div class="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 shadow-xl">
-            <div class="flex justify-between items-center mb-4 text-emerald-400">
-                <button onclick="changeMonth(-1)" class="text-sm px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition">◀ 先月</button>
-                <div id="calendar-month" class="text-center font-bold text-lg">----年 --月</div>
-                <button onclick="changeMonth(1)" class="text-sm px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition">翌月 ▶</button>
-            </div>
-            
-            <div class="grid grid-cols-7 text-center text-xs font-semibold text-slate-500 mb-2">
-                <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
-            </div>
-            <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center"></div>
-            
-            <div id="back-to-today-container" class="mt-3 text-center hidden">
-                <button onclick="resetMonth()" class="text-xs text-slate-400 hover:text-emerald-400 transition underline">今月に戻る</button>
-            </div>
+    <main
+      class="flex-1 p-4 max-w-md mx-auto w-full flex flex-col justify-between gap-6"
+    >
+      <div
+        class="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 shadow-xl"
+      >
+        <div class="flex justify-between items-center mb-4 text-emerald-400">
+          <button
+            onclick="changeMonth(-1)"
+            class="text-sm px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition"
+          >
+            ◀ 先月
+          </button>
+          <div id="calendar-month" class="text-center font-bold text-lg">
+            ----年 --月
+          </div>
+          <button
+            onclick="changeMonth(1)"
+            class="text-sm px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition"
+          >
+            翌月 ▶
+          </button>
         </div>
 
-        <div id="ai-box" class="bg-gradient-to-br from-emerald-950/40 to-slate-800/40 rounded-2xl p-5 border border-emerald-500/20 shadow-lg min-h-[100px] flex items-center justify-center transition-all duration-300">
-            <p id="ai-message" class="text-slate-300 text-sm leading-relaxed text-center italic">
-                夜になったら、今日のマスを「長押し」して生き延びた証（✕）を刻もう。
-            </p>
+        <div
+          class="grid grid-cols-7 text-center text-xs font-semibold text-slate-500 mb-2"
+        >
+          <div>日</div>
+          <div>月</div>
+          <div>火</div>
+          <div>水</div>
+          <div>木</div>
+          <div>金</div>
+          <div>土</div>
         </div>
+        <div
+          id="calendar-grid"
+          class="grid grid-cols-7 gap-2 text-center"
+        ></div>
 
-        <div class="text-center">
-            <button onclick="toggleModal(true)" class="text-xs text-slate-500 hover:text-slate-300 transition">
-                ⚙️ アプリの設定（目標日・性格・デバッグ）
-            </button>
+        <div id="back-to-today-container" class="mt-3 text-center hidden">
+          <button
+            onclick="resetMonth()"
+            class="text-xs text-slate-400 hover:text-emerald-400 transition underline"
+          >
+            今月に戻る
+          </button>
         </div>
+      </div>
+
+      <div
+        id="ai-box"
+        class="bg-gradient-to-br from-emerald-950/40 to-slate-800/40 rounded-2xl p-5 border border-emerald-500/20 shadow-lg min-h-[100px] flex items-center justify-center transition-all duration-300"
+      >
+        <p
+          id="ai-message"
+          class="text-slate-300 text-sm leading-relaxed text-center italic"
+        >
+          夜になったら、今日のマスを「長押し」して生き延びた証（✕）を刻もう。
+        </p>
+      </div>
+
+      <div class="text-center">
+        <button
+          onclick="toggleModal(true)"
+          class="text-xs text-slate-500 hover:text-slate-300 transition"
+        >
+          ⚙️ アプリの設定（目標日・性格・デバッグ）
+        </button>
+      </div>
     </main>
 
-    <div id="config-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-slate-800 w-full max-w-sm rounded-2xl p-6 border border-slate-700 shadow-2xl my-4">
-            <h2 class="text-lg font-bold mb-4 text-white">設定</h2>
-            
-            <div class="space-y-4 mb-6">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">イベント名</label>
-                    <input type="text" id="input-title" placeholder="お盆休み！" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">目標日</label>
-                    <input type="date" id="input-date" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">AIの性格（労いトーン）</label>
-                    <select id="input-character" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-rose-500 text-sm">
-                        <option value="gentle_f">優しいお姉さん（全肯定・包容力）</option>
-                        <option value="gentle_m">優しいお兄さん（全肯定・包容力）</option>
-                        <option value="friend_f">女友達（フランク・共感）</option>
-                        <option value="friend_m">男友達（フランク・共感）</option>
-                        <option value="senior_f">頼れる女性の先輩（落ち着いたトーン・労い）</option>
-                        <option value="senior_m">頼れる男性の先輩（落ち着いたトーン・労い）</option>
-                        <option value="cat">気まぐれな猫（〜にゃ・とにかく癒やし）</option>
-                        <option value="hot">熱血なラグビー部主将（あの屈強な男子）</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Gemini API Key（無料）</label>
-                    <input type="password" id="input-key" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-400 focus:outline-none focus:border-rose-500">
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-slate-700">
-                    <label class="text-xs font-semibold text-slate-400">デバッグモード（タップ解除＆即時APIテスト）</label>
-                    <input type="checkbox" id="input-debug" class="w-4 h-4 text-rose-600 bg-slate-900 border-slate-700 rounded focus:ring-rose-500">
-                </div>
-            </div>
+    <div
+      id="config-modal"
+      class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
+    >
+      <div
+        class="bg-slate-800 w-full max-w-sm rounded-2xl p-6 border border-slate-700 shadow-2xl my-4"
+      >
+        <h2 class="text-lg font-bold mb-4 text-white">設定</h2>
 
-            <div class="flex gap-3">
-                <button onclick="toggleModal(false)" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 rounded-lg transition text-sm">キャンセル</button>
-                <button onclick="saveConfig()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-medium py-2 rounded-lg transition text-sm">保存する</button>
-            </div>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1"
+              >イベント名</label
+            >
+            <input
+              type="text"
+              id="input-title"
+              placeholder="お盆休み！"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-rose-500"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1"
+              >目標日</label
+            >
+            <input
+              type="date"
+              id="input-date"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-rose-500"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1"
+              >AIの性格（労いトーン）</label
+            >
+            <select
+              id="input-character"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-rose-500 text-sm"
+            >
+              <option value="gentle_f">優しいお姉さん（全肯定・包容力）</option>
+              <option value="gentle_m">優しいお兄さん（全肯定・包容力）</option>
+              <option value="friend_f">女友達（フランク・共感）</option>
+              <option value="friend_m">男友達（フランク・共感）</option>
+              <option value="senior_f">
+                頼れる女性の先輩（落ち着いたトーン・労い）
+              </option>
+              <option value="senior_m">
+                頼れる男性の先輩（落ち着いたトーン・労い）
+              </option>
+              <option value="cat">
+                気まぐれな猫（〜にゃ・とにかく癒やし）
+              </option>
+              <option value="hot">
+                熱血なラグビー部主将（あの屈強な男子）
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1"
+              >Gemini API Key（無料）</label
+            >
+            <input
+              type="password"
+              id="input-key"
+              placeholder="AIzaSy..."
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-400 focus:outline-none focus:border-rose-500"
+            />
+          </div>
+          <div
+            class="flex items-center justify-between pt-2 border-t border-slate-700"
+          >
+            <label class="text-xs font-semibold text-slate-400"
+              >デバッグモード（タップ解除＆即時APIテスト）</label
+            >
+            <input
+              type="checkbox"
+              id="input-debug"
+              class="w-4 h-4 text-rose-600 bg-slate-900 border-slate-700 rounded focus:ring-rose-500"
+            />
+          </div>
         </div>
+
+        <div class="flex gap-3">
+          <button
+            onclick="toggleModal(false)"
+            class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 rounded-lg transition text-sm"
+          >
+            キャンセル
+          </button>
+          <button
+            onclick="saveConfig()"
+            class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-medium py-2 rounded-lg transition text-sm"
+          >
+            保存する
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('surv_db')) || {
-            config: { targetDate: '', title: '', geminiApiKey: '', aiCharacter: 'gentle_f', debugMode: false },
-            survivalLogs: [],
-            nextAiMessage: ''
-        };
+      let db = JSON.parse(localStorage.getItem("surv_db")) || {
+        config: {
+          targetDate: "",
+          title: "",
+          geminiApiKey: "",
+          aiCharacter: "gentle_f",
+          debugMode: false,
+        },
+        survivalLogs: [],
+        nextAiMessage: "",
+      };
 
-        if (['gentle', 'friend', 'senior'].includes(db.config.aiCharacter)) {
-            db.config.aiCharacter += '_f';
+      if (["gentle", "friend", "senior"].includes(db.config.aiCharacter)) {
+        db.config.aiCharacter += "_f";
+      }
+
+      let holdTimer = null;
+      const HOLD_DURATION = 1200;
+
+      // --- 表示用の年月を管理する変数 ---
+      const realToday = new Date();
+      let displayYear = realToday.getFullYear();
+      let displayMonth = realToday.getMonth(); // 0〜11
+
+      const defaultMessages = {
+        gentle_f: [
+          "今日もお疲れ様。本当に、本当によく頑張ったね。えらいよ。",
+          "よしよし、今日も一日無事に終わってよかった。ゆっくり休んでね。",
+          "無理しないでね。あなたの頑張り、私はちゃんと見てるから。",
+        ],
+        gentle_m: [
+          "今日もお疲れ様。本当に、本当によく頑張ったね。えらいよ。",
+          "よしよし、今日も一日無事に終わってよかったな。ゆっくり休んで。",
+          "無理するなよ。お前の頑張り、俺はちゃんと見てるからな。",
+        ],
+        friend_f: [
+          "おつかれ！今日も1日生き延びてマジでえらいわ。ゆっくり休もう。",
+          "ほんとにお疲れ様！嫌なことは全部忘れて、今日はもう寝ちゃお！",
+          "今日もよく耐えたね！マジでリスペクトだわ。",
+        ],
+        friend_m: [
+          "おつかれ！今日も1日生き延びてマジでえらいわ。ゆっくり休もうぜ。",
+          "ほんとにお疲れ！嫌なことは全部忘れて、今日はもう寝ようぜ！",
+          "今日もよく耐えたな！マジでリスペクトだわ。",
+        ],
+        senior_f: [
+          "お疲れ様。今日も色々あっただろうに、よく無事に乗り切ってくれたね。",
+          "今日も一日よく頑張ったね。たまには肩の力を抜いて、しっかり休みなさい。",
+          "あなたの頑張りはみんな助かってるよ。今日はもうゆっくり休んでね。",
+        ],
+        senior_m: [
+          "お疲れ様。今日も色々あっただろうが、よく無事に乗り切ってくれた。",
+          "今日も一日よく頑張ったな。たまには肩の力を抜いて、しっかり休めよ。",
+          "お前の頑張りはみんな助かってるぞ。今日はもうゆっくり休め。",
+        ],
+        cat: [
+          "今日もお仕事がんばったのかにゃ？えらいにゃ。撫でていいにゃ。",
+          "お疲れにゃん。今日も無事に帰ってきてくれて嬉しいにゃ。",
+          "ごろんしていいにゃ。今日はもう一緒に寝るにゃ。",
+        ],
+        hot: [
+          "よし！今日も一日、限界突破で耐え抜いたな！お前は最高だ！",
+          "その泥臭さが明日を作るんだ！今日もナイスガッツだ！",
+          "よく耐えた！お前のメンタルは鋼だ！胸を張って寝ろ！",
+        ],
+      };
+
+      window.addEventListener("DOMContentLoaded", () => {
+        initApp();
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("sw.js").catch(() => {});
+        }
+      });
+
+      function initApp() {
+        updateCountdown();
+        renderCalendar();
+
+        const banner = document.getElementById("debug-banner");
+        if (db.config.debugMode) {
+          banner.classList.remove("hidden");
+        } else {
+          banner.classList.add("hidden");
         }
 
-        let holdTimer = null;
-        const HOLD_DURATION = 1200;
+        if (
+          !db.nextAiMessage &&
+          db.config.geminiApiKey &&
+          !db.config.debugMode
+        ) {
+          preloadNextAiMessage();
+        }
+        if (!db.config.targetDate) toggleModal(true);
+      }
 
-        // --- 表示用の年月を管理する変数 ---
-        const realToday = new Date();
-        let displayYear = realToday.getFullYear();
-        let displayMonth = realToday.getMonth(); // 0〜11
+      function updateCountdown() {
+        const titleEl = document.getElementById("event-title");
+        const daysEl = document.getElementById("countdown-days");
 
-        const defaultMessages = {
-            gentle_f: [
-                "今日もお疲れ様。本当に、本当によく頑張ったね。えらいよ。",
-                "よしよし、今日も一日無事に終わってよかった。ゆっくり休んでね。",
-                "無理しないでね。あなたの頑張り、私はちゃんと見てるから。"
-            ],
-            gentle_m: [
-                "今日もお疲れ様。本当に、本当によく頑張ったね。えらいよ。",
-                "よしよし、今日も一日無事に終わってよかったな。ゆっくり休んで。",
-                "無理するなよ。お前の頑張り、俺はちゃんと見てるからな。"
-            ],
-            friend_f: [
-                "おつかれ！今日も1日生き延びてマジでえらいわ。ゆっくり休もう。",
-                "ほんとにお疲れ様！嫌なことは全部忘れて、今日はもう寝ちゃお！",
-                "今日もよく耐えたね！マジでリスペクトだわ。"
-            ],
-            friend_m: [
-                "おつかれ！今日も1日生き延びてマジでえらいわ。ゆっくり休もうぜ。",
-                "ほんとにお疲れ！嫌なことは全部忘れて、今日はもう寝ようぜ！",
-                "今日もよく耐えたな！マジでリスペクトだわ。"
-            ],
-            senior_f: [
-                "お疲れ様。今日も色々あっただろうに、よく無事に乗り切ってくれたね。",
-                "今日も一日よく頑張ったね。たまには肩の力を抜いて、しっかり休みなさい。",
-                "あなたの頑張りはみんな助かってるよ。今日はもうゆっくり休んでね。"
-            ],
-            senior_m: [
-                "お疲れ様。今日も色々あっただろうが、よく無事に乗り切ってくれた。",
-                "今日も一日よく頑張ったな。たまには肩の力を抜いて、しっかり休めよ。",
-                "お前の頑張りはみんな助かってるぞ。今日はもうゆっくり休め。"
-            ],
-            cat: [
-                "今日もお仕事がんばったのかにゃ？えらいにゃ。撫でていいにゃ。",
-                "お疲れにゃん。今日も無事に帰ってきてくれて嬉しいにゃ。",
-                "ごろんしていいにゃ。今日はもう一緒に寝るにゃ。"
-            ],
-            hot: [
-                "よし！今日も一日、限界突破で耐え抜いたな！お前は最高だ！",
-                "その泥臭さが明日を作るんだ！今日もナイスガッツだ！",
-                "よく耐えた！お前のメンタルは鋼だ！胸を張って寝ろ！"
-            ]
+        if (!db.config.targetDate) {
+          titleEl.textContent = "目標を設定してください";
+          daysEl.textContent = "--";
+          return;
+        }
+
+        titleEl.textContent = db.config.title || "目標日";
+        const target = new Date(db.config.targetDate + "T00:00:00");
+        const now = new Date();
+        target.setHours(0, 0, 0, 0);
+        now.setHours(0, 0, 0, 0);
+
+        const diffTime = target - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        daysEl.textContent = diffDays >= 0 ? diffDays : 0;
+      }
+
+      // --- 月移動の制御 ---
+      function changeMonth(offset) {
+        displayMonth += offset;
+        if (displayMonth < 0) {
+          displayMonth = 11;
+          displayYear--;
+        } else if (displayMonth > 11) {
+          displayMonth = 0;
+          displayYear++;
+        }
+        renderCalendar();
+      }
+
+      function resetMonth() {
+        displayYear = realToday.getFullYear();
+        displayMonth = realToday.getMonth();
+        renderCalendar();
+      }
+
+      function renderCalendar() {
+        const grid = document.getElementById("calendar-grid");
+        const monthTitle = document.getElementById("calendar-month");
+        const backToTodayBtn = document.getElementById(
+          "back-to-today-container",
+        );
+
+        grid.innerHTML = "";
+
+        monthTitle.textContent = `${displayYear}年 ${displayMonth + 1}月`;
+
+        // 今見ている月が「今月」かどうかでボタンの表示を切り替え
+        if (
+          displayYear === realToday.getFullYear() &&
+          displayMonth === realToday.getMonth()
+        ) {
+          backToTodayBtn.classList.add("hidden");
+        } else {
+          backToTodayBtn.classList.remove("hidden");
+        }
+
+        const firstDay = new Date(displayYear, displayMonth, 1).getDay();
+        const totalDays = new Date(displayYear, displayMonth + 1, 0).getDate();
+
+        // 本日の日付文字列
+        const todayStr = `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, "0")}-${String(realToday.getDate()).padStart(2, "0")}`;
+
+        // 本日0時の時刻（過去日判定用）
+        const todayZero = new Date(realToday);
+        todayZero.setHours(0, 0, 0, 0);
+
+        for (let i = 0; i < firstDay; i++) {
+          grid.appendChild(document.createElement("div"));
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+          const dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const currentCellDate = new Date(displayYear, displayMonth, day);
+
+          const cell = document.createElement("div");
+          cell.className =
+            "aspect-square bg-slate-800 rounded-xl flex items-center justify-center relative font-bold text-sm border border-slate-700/30 overflow-hidden";
+          cell.textContent = day;
+
+          const isMarked = db.survivalLogs.includes(dateStr);
+          const isToday = dateStr === todayStr;
+
+          const xMark = document.createElement("div");
+          xMark.innerText = "✕";
+          xMark.className = `absolute inset-0 flex items-center justify-center text-rose-500 text-2xl font-black bg-slate-950/20 x-draw`;
+
+          if (db.config.debugMode) {
+            // デバッグモード：全マス操作可能
+            cell.classList.add(
+              "cursor-pointer",
+              "border-amber-500/40",
+              "hover:bg-slate-700",
+            );
+            if (isMarked) {
+              xMark.style.transform = "scale(1)";
+              xMark.style.opacity = "1";
+              cell.appendChild(xMark);
+              cell.classList.add("bg-slate-900/50", "text-slate-600");
+            } else {
+              xMark.style.transform = "scale(3)";
+              xMark.style.opacity = "0";
+              cell.appendChild(xMark);
+            }
+
+            cell.addEventListener("click", () => {
+              if (db.survivalLogs.includes(dateStr)) {
+                db.survivalLogs = db.survivalLogs.filter(
+                  (log) => log !== dateStr,
+                );
+              } else {
+                db.survivalLogs.push(dateStr);
+                testAiMessageDirectly();
+              }
+              localStorage.setItem("surv_db", JSON.stringify(db));
+              renderCalendar();
+            });
+          } else {
+            // 通常モード：今日のマスのみ操作可能
+            if (isMarked) {
+              xMark.style.transform = "scale(1)";
+              xMark.style.opacity = "1";
+              cell.appendChild(xMark);
+              cell.classList.add("bg-slate-900/50", "text-slate-600");
+            } else if (isToday) {
+              cell.classList.add(
+                "border-emerald-500",
+                "ring-2",
+                "ring-emerald-500/20",
+                "cursor-pointer",
+              );
+              xMark.style.transform = "scale(3)";
+              xMark.style.opacity = "0";
+              cell.appendChild(xMark);
+
+              setupHoldEvent(cell, xMark, dateStr);
+            } else if (currentCellDate < todayZero) {
+              // 過去のマス
+              cell.classList.add("text-slate-600");
+            } else {
+              // 未来のマス
+              cell.classList.add("text-slate-500/50");
+            }
+          }
+
+          grid.appendChild(cell);
+        }
+      }
+
+      function setupHoldEvent(element, xMark, dateStr) {
+        const startHandler = (e) => {
+          e.preventDefault();
+          if (db.survivalLogs.includes(dateStr)) return;
+
+          if (navigator.vibrate) navigator.vibrate(10);
+          xMark.style.transform = "scale(1.1)";
+          xMark.style.opacity = "0.8";
+
+          holdTimer = setTimeout(() => {
+            if (navigator.vibrate) navigator.vibrate([100, 30, 100]);
+            xMark.style.transform = "scale(1)";
+            xMark.style.opacity = "1";
+
+            db.survivalLogs.push(dateStr);
+            localStorage.setItem("surv_db", JSON.stringify(db));
+
+            renderCalendar();
+            showSurvivalMessage();
+          }, HOLD_DURATION);
         };
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initApp();
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').catch(() => {});
+        const cancelHandler = () => {
+          if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+            if (!db.survivalLogs.includes(dateStr)) {
+              xMark.style.transform = "scale(3)";
+              xMark.style.opacity = "0";
             }
+          }
+        };
+
+        element.addEventListener("mousedown", startHandler);
+        element.addEventListener("mouseup", cancelHandler);
+        element.addEventListener("mouseleave", cancelHandler);
+        element.addEventListener("touchstart", startHandler, {
+          passive: false,
         });
+        element.addEventListener("touchend", cancelHandler);
+        element.addEventListener("touchcancel", cancelHandler);
+      }
 
-        function initApp() {
-            updateCountdown();
-            renderCalendar();
-            
-            const banner = document.getElementById('debug-banner');
-            if (db.config.debugMode) {
-                banner.classList.remove('hidden');
-            } else {
-                banner.classList.add('hidden');
-            }
+      function showSurvivalMessage() {
+        const aiMessage = document.getElementById("ai-message");
+        const charType = db.config.aiCharacter || "gentle_f";
 
-            if (!db.nextAiMessage && db.config.geminiApiKey && !db.config.debugMode) {
-                preloadNextAiMessage();
-            }
-            if (!db.config.targetDate) toggleModal(true);
+        const defaultArray =
+          defaultMessages[charType] || defaultMessages["gentle_f"];
+        const randomDefault =
+          defaultArray[Math.floor(Math.random() * defaultArray.length)];
+        const msg = db.nextAiMessage || randomDefault;
+
+        aiMessage.style.opacity = 0;
+        setTimeout(() => {
+          aiMessage.innerHTML = `🎉 <b>${msg}</b>`;
+          aiMessage.style.opacity = 1;
+        }, 150);
+
+        if (db.config.geminiApiKey) {
+          preloadNextAiMessage();
         }
+      }
 
-        function updateCountdown() {
-            const titleEl = document.getElementById('event-title');
-            const daysEl = document.getElementById('countdown-days');
-            
-            if (!db.config.targetDate) {
-                titleEl.textContent = "目標を設定してください";
-                daysEl.textContent = "--";
+      // プロンプトを強化：「被り厳禁」「毎回違う表現」を明示
+      function getCharacterPrompt(charType) {
+        const baseRule =
+          "【重要ルール】：毎回必ず、これまでとは違う視点や言い回し、新しい表現を使ってください。似たような言葉の繰り返し（マンネリ化）は厳禁です。";
+        switch (charType) {
+          case "gentle_f":
+            return `${baseRule} 包容力のある優しいお姉さんとして、ひたすら優しく、相手を包み込むように全肯定して癒やしてください。口調は女性らしく、物静かで優しいタメ口。`;
+          case "gentle_m":
+            return `${baseRule} 包容力のある優しいお兄さんとして、ひたすら優しく、相手を包み込むように全肯定して癒やしてください。口調は男性らしく、物静かで優しいタメ口。`;
+          case "friend_f":
+            return `${baseRule} 等身大のフランクな女友達として、共感しつつ『マジでお疲れ！』と明るくフランクに労ってください。口調は20代女性の親しみやすいタメ口。`;
+          case "friend_m":
+            return `${baseRule} 等身大のフランクな男友達として、共感しつつ『マジでお疲れ！』と明るくフランクに労ってください。口調は20代男性の親しみやすいタメ口。`;
+          case "senior_f":
+            return `${baseRule} 会社の物静かで尊敬できる女性の先輩として、少し落ち着いたトーンで『今日もよく頑張ったね』と大人の余裕を持って労ってください。口調は女性らしく丁寧ながらも少し崩した優しいタメ口。`;
+          case "senior_m":
+            return `${baseRule} 会社の物静かで尊敬できる男性の先輩として、少し落ち着いたトーンで『今日もよく頑張ったな』と大人の余裕を持って労ってください。口調は男性らしく落ち着いたタメ口。`;
+          case "cat":
+            return `${baseRule} 人間の言葉が喋れる可愛くてちょっと気まぐれな猫として、語尾に『〜にゃ』『〜にゃん』をつけて、ただただ可愛く無条件で癒やしてください。毎回違う猫の仕草も入れてください。`;
+          case "hot":
+            return `${baseRule} 熱血なラグビー部主将として、汗臭く泥臭く熱く、大きな声で限界突破を褒めちぎってください。比喩表現を毎回変えてください。`;
+          default:
+            return `${baseRule} 包容力のある優しい人として、ひたすら優しく全肯定して癒やしてください。`;
+        }
+      }
+
+      // 共通：エラー時はデフォルトメッセージを返すヘルパー
+      function getFallbackMessage() {
+        const charType = db.config.aiCharacter || "gentle_f";
+        const messages =
+          defaultMessages[charType] || defaultMessages["gentle_f"];
+        return messages[Math.floor(Math.random() * messages.length)];
+      }
+
+      // バックグラウンド用：3回粘ってダメならデフォルトへ
+      async function preloadNextAiMessage() {
+        const charType = db.config.aiCharacter || "gentle_f";
+        const prompt = `仕事が本当に辛く、${db.config.title || "目標"}を楽しみに毎日耐えて生きている私に、今日を無事に生き延びたことを労うメッセージを、以下のキャラクター設定に従って、50文字前後で送ってください。\n【キャラクター設定】:${getCharacterPrompt(charType)}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${db.config.geminiApiKey}`;
+
+        for (let i = 0; i < 3; i++) {
+          try {
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.95 },
+              }),
+            });
+            if (response.ok) {
+              const data = await response.json();
+              if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                db.nextAiMessage =
+                  data.candidates[0].content.parts[0].text.trim();
+                localStorage.setItem("surv_db", JSON.stringify(db));
                 return;
+              }
+            }
+          } catch (e) {
+            /* 通信エラー時はリトライ */
+          }
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+        // 3回失敗したら空にしておく（次回表示時にgetFallbackMessageが呼ばれる）
+        db.nextAiMessage = "";
+        localStorage.setItem("surv_db", JSON.stringify(db));
+      }
+
+      // デバッグモード用：3回リトライ後、原因別にフォールバック表示
+      async function testAiMessageDirectly() {
+        const aiMessage = document.getElementById("ai-message");
+        if (!db.config.geminiApiKey) {
+          aiMessage.innerHTML = "⚠️ <b>APIキー未設定</b>";
+          return;
+        }
+        aiMessage.innerHTML =
+          "<span class='text-amber-400'>デバッグ：AI生成中...</span>";
+        const charType = db.config.aiCharacter || "gentle_f";
+        const prompt = `仕事が本当に辛く、${db.config.title || "目標"}を楽しみに毎日耐えて生きている私に、今日を無事に生き延びたことを労うメッセージを、以下のキャラクター設定に従って、50文字前後で送ってください。\n【キャラクター設定】:${getCharacterPrompt(charType)}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${db.config.geminiApiKey}`;
+        let errorType = "unknown";
+        for (let i = 0; i < 3; i++) {
+          try {
+            const response = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [
+                      {
+                        text: prompt,
+                      },
+                    ],
+                  },
+                ],
+                generationConfig: {
+                  temperature: 0.95,
+                },
+              }),
+            });
+
+            if (!response.ok) {
+              if (response.status === 429) {
+                errorType = "quota";
+              } else {
+                errorType = "api";
+              }
+
+              if (i < 2) {
+                await new Promise((r) => setTimeout(r, 1500));
+                continue;
+              }
+
+              break;
             }
 
-            titleEl.textContent = db.config.title || "目標日";
-            const target = new Date(db.config.targetDate + "T00:00:00");
-            const now = new Date();
-            target.setHours(0,0,0,0);
-            now.setHours(0,0,0,0);
+            const data = await response.json();
 
-            const diffTime = target - now;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            daysEl.textContent = diffDays >= 0 ? diffDays : 0;
-        }
-
-        // --- 月移動の制御 ---
-        function changeMonth(offset) {
-            displayMonth += offset;
-            if (displayMonth < 0) {
-                displayMonth = 11;
-                displayYear--;
-            } else if (displayMonth > 11) {
-                displayMonth = 0;
-                displayYear++;
-            }
-            renderCalendar();
-        }
-
-        function resetMonth() {
-            displayYear = realToday.getFullYear();
-            displayMonth = realToday.getMonth();
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            const grid = document.getElementById('calendar-grid');
-            const monthTitle = document.getElementById('calendar-month');
-            const backToTodayBtn = document.getElementById('back-to-today-container');
-            
-            grid.innerHTML = '';
-
-            monthTitle.textContent = `${displayYear}年 ${displayMonth + 1}月`;
-
-            // 今見ている月が「今月」かどうかでボタンの表示を切り替え
-            if (displayYear === realToday.getFullYear() && displayMonth === realToday.getMonth()) {
-                backToTodayBtn.classList.add('hidden');
-            } else {
-                backToTodayBtn.classList.remove('hidden');
+            if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              aiMessage.innerHTML = `🛠️ <b>${data.candidates[0].content.parts[0].text.trim()}</b>`;
+              return;
             }
 
-            const firstDay = new Date(displayYear, displayMonth, 1).getDay();
-            const totalDays = new Date(displayYear, displayMonth + 1, 0).getDate();
-            
-            // 本日の日付文字列
-            const todayStr = `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
-            
-            // 本日0時の時刻（過去日判定用）
-            const todayZero = new Date(realToday);
-            todayZero.setHours(0,0,0,0);
+            errorType = "api";
+          } catch (e) {
+            errorType = "network";
 
-            for (let i = 0; i < firstDay; i++) {
-                grid.appendChild(document.createElement('div'));
+            if (i < 2) {
+              await new Promise((r) => setTimeout(r, 1500));
+              continue;
             }
-
-            for (let day = 1; day <= totalDays; day++) {
-                const dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const currentCellDate = new Date(displayYear, displayMonth, day);
-                
-                const cell = document.createElement('div');
-                cell.className = "aspect-square bg-slate-800 rounded-xl flex items-center justify-center relative font-bold text-sm border border-slate-700/30 overflow-hidden";
-                cell.textContent = day;
-
-                const isMarked = db.survivalLogs.includes(dateStr);
-                const isToday = dateStr === todayStr;
-
-                const xMark = document.createElement('div');
-                xMark.innerText = '✕';
-                xMark.className = `absolute inset-0 flex items-center justify-center text-rose-500 text-2xl font-black bg-slate-950/20 x-draw`;
-
-                if (db.config.debugMode) {
-                    // デバッグモード：全マス操作可能
-                    cell.classList.add('cursor-pointer', 'border-amber-500/40', 'hover:bg-slate-700');
-                    if (isMarked) {
-                        xMark.style.transform = 'scale(1)';
-                        xMark.style.opacity = '1';
-                        cell.appendChild(xMark);
-                        cell.classList.add('bg-slate-900/50', 'text-slate-600');
-                    } else {
-                        xMark.style.transform = 'scale(3)';
-                        xMark.style.opacity = '0';
-                        cell.appendChild(xMark);
-                    }
-
-                    cell.addEventListener('click', () => {
-                        if (db.survivalLogs.includes(dateStr)) {
-                            db.survivalLogs = db.survivalLogs.filter(log => log !== dateStr);
-                        } else {
-                            db.survivalLogs.push(dateStr);
-                            testAiMessageDirectly();
-                        }
-                        localStorage.setItem('surv_db', JSON.stringify(db));
-                        renderCalendar();
-                    });
-
-                } else {
-                    // 通常モード：今日のマスのみ操作可能
-                    if (isMarked) {
-                        xMark.style.transform = 'scale(1)';
-                        xMark.style.opacity = '1';
-                        cell.appendChild(xMark);
-                        cell.classList.add('bg-slate-900/50', 'text-slate-600');
-                    } else if (isToday) {
-                        cell.classList.add('border-emerald-500', 'ring-2', 'ring-emerald-500/20', 'cursor-pointer');
-                        xMark.style.transform = 'scale(3)';
-                        xMark.style.opacity = '0';
-                        cell.appendChild(xMark);
-
-                        setupHoldEvent(cell, xMark, dateStr);
-                    } else if (currentCellDate < todayZero) {
-                        // 過去のマス
-                        cell.classList.add('text-slate-600');
-                    } else {
-                        // 未来のマス
-                        cell.classList.add('text-slate-500/50');
-                    }
-                }
-
-                grid.appendChild(cell);
-            }
+          }
         }
 
-        function setupHoldEvent(element, xMark, dateStr) {
-            const startHandler = (e) => {
-                e.preventDefault();
-                if (db.survivalLogs.includes(dateStr)) return;
+        let reasonText = "";
 
-                if(navigator.vibrate) navigator.vibrate(10);
-                xMark.style.transform = 'scale(1.1)';
-                xMark.style.opacity = '0.8';
+        switch (errorType) {
+          case "quota":
+            reasonText = "AI利用上限";
+            break;
 
-                holdTimer = setTimeout(() => {
-                    if(navigator.vibrate) navigator.vibrate([100, 30, 100]);
-                    xMark.style.transform = 'scale(1)';
-                    xMark.style.opacity = '1';
-                    
-                    db.survivalLogs.push(dateStr);
-                    localStorage.setItem('surv_db', JSON.stringify(db));
-                    
-                    renderCalendar();
-                    showSurvivalMessage();
-                }, HOLD_DURATION);
-            };
+          case "network":
+            reasonText = "通信エラー";
+            break;
 
-            const cancelHandler = () => {
-                if (holdTimer) {
-                    clearTimeout(holdTimer);
-                    holdTimer = null;
-                    if (!db.survivalLogs.includes(dateStr)) {
-                        xMark.style.transform = 'scale(3)';
-                        xMark.style.opacity = '0';
-                    }
-                }
-            };
+          case "api":
+            reasonText = "AIサービスエラー";
+            break;
 
-            element.addEventListener('mousedown', startHandler);
-            element.addEventListener('mouseup', cancelHandler);
-            element.addEventListener('mouseleave', cancelHandler);
-            element.addEventListener('touchstart', startHandler, {passive: false});
-            element.addEventListener('touchend', cancelHandler);
-            element.addEventListener('touchcancel', cancelHandler);
+          default:
+            reasonText = "エラー";
         }
 
-        function showSurvivalMessage() {
-            const aiMessage = document.getElementById('ai-message');
-            const charType = db.config.aiCharacter || 'gentle_f';
-            
-            const defaultArray = defaultMessages[charType] || defaultMessages['gentle_f'];
-            const randomDefault = defaultArray[Math.floor(Math.random() * defaultArray.length)];
-            const msg = db.nextAiMessage || randomDefault;
-            
-            aiMessage.style.opacity = 0;
-            setTimeout(() => {
-                aiMessage.innerHTML = `🎉 <b>${msg}</b>`;
-                aiMessage.style.opacity = 1;
-            }, 150);
+        aiMessage.innerHTML = `
+        🌟 <b>${getFallbackMessage()}</b>
+        <span class="text-xs block text-slate-500">
+            (${reasonText})
+        </span>
+    `;
+      }
 
-            if (db.config.geminiApiKey) {
-                preloadNextAiMessage();
-            }
+      function toggleModal(show) {
+        const modal = document.getElementById("config-modal");
+        if (show) {
+          document.getElementById("input-title").value = db.config.title || "";
+          document.getElementById("input-date").value =
+            db.config.targetDate || "";
+          document.getElementById("input-character").value =
+            db.config.aiCharacter || "gentle_f";
+          document.getElementById("input-key").value =
+            db.config.geminiApiKey || "";
+          document.getElementById("input-debug").checked =
+            db.config.debugMode || false;
+          modal.classList.remove("hidden");
+        } else {
+          modal.classList.add("hidden");
+        }
+      }
+
+      function saveConfig() {
+        const oldKey = db.config.geminiApiKey;
+        const oldChar = db.config.aiCharacter;
+        const oldDebug = db.config.debugMode;
+
+        db.config.title =
+          document.getElementById("input-title").value || "お盆休み！";
+        db.config.targetDate = document.getElementById("input-date").value;
+        db.config.aiCharacter =
+          document.getElementById("input-character").value;
+        db.config.geminiApiKey = document.getElementById("input-key").value;
+        db.config.debugMode = document.getElementById("input-debug").checked;
+
+        localStorage.setItem("surv_db", JSON.stringify(db));
+        toggleModal(false);
+
+        if (
+          !db.config.debugMode &&
+          db.config.geminiApiKey &&
+          (db.config.geminiApiKey !== oldKey ||
+            db.config.aiCharacter !== oldChar ||
+            oldDebug !== db.config.debugMode)
+        ) {
+          preloadNextAiMessage();
         }
 
-        // プロンプトを強化：「被り厳禁」「毎回違う表現」を明示
-        function getCharacterPrompt(charType) {
-            const baseRule = "【重要ルール】：毎回必ず、これまでとは違う視点や言い回し、新しい表現を使ってください。似たような言葉の繰り返し（マンネリ化）は厳禁です。";
-            switch(charType) {
-                case 'gentle_f': return `${baseRule} 包容力のある優しいお姉さんとして、ひたすら優しく、相手を包み込むように全肯定して癒やしてください。口調は女性らしく、物静かで優しいタメ口。`;
-                case 'gentle_m': return `${baseRule} 包容力のある優しいお兄さんとして、ひたすら優しく、相手を包み込むように全肯定して癒やしてください。口調は男性らしく、物静かで優しいタメ口。`;
-                case 'friend_f': return `${baseRule} 等身大のフランクな女友達として、共感しつつ『マジでお疲れ！』と明るくフランクに労ってください。口調は20代女性の親しみやすいタメ口。`;
-                case 'friend_m': return `${baseRule} 等身大のフランクな男友達として、共感しつつ『マジでお疲れ！』と明るくフランクに労ってください。口調は20代男性の親しみやすいタメ口。`;
-                case 'senior_f': return `${baseRule} 会社の物静かで尊敬できる女性の先輩として、少し落ち着いたトーンで『今日もよく頑張ったね』と大人の余裕を持って労ってください。口調は女性らしく丁寧ながらも少し崩した優しいタメ口。`;
-                case 'senior_m': return `${baseRule} 会社の物静かで尊敬できる男性の先輩として、少し落ち着いたトーンで『今日もよく頑張ったな』と大人の余裕を持って労ってください。口調は男性らしく落ち着いたタメ口。`;
-                case 'cat': return `${baseRule} 人間の言葉が喋れる可愛くてちょっと気まぐれな猫として、語尾に『〜にゃ』『〜にゃん』をつけて、ただただ可愛く無条件で癒やしてください。毎回違う猫の仕草も入れてください。`;
-                case 'hot': return `${baseRule} 熱血なラグビー部主将として、汗臭く泥臭く熱く、大きな声で限界突破を褒めちぎってください。比喩表現を毎回変えてください。`;
-                default: return `${baseRule} 包容力のある優しい人として、ひたすら優しく全肯定して癒やしてください。`;
-            }
-        }
-
-        // 共通：エラー時はデフォルトメッセージを返すヘルパー
-        function getFallbackMessage() {
-            const charType = db.config.aiCharacter || 'gentle_f';
-            const messages = defaultMessages[charType] || defaultMessages['gentle_f'];
-            return messages[Math.floor(Math.random() * messages.length)];
-        }
-
-        // バックグラウンド用：3回粘ってダメならデフォルトへ
-        async function preloadNextAiMessage() {
-            const charType = db.config.aiCharacter || 'gentle_f';
-            const prompt = `仕事が本当に辛く、${db.config.title || '目標'}を楽しみに毎日耐えて生きている私に、今日を無事に生き延びたことを労うメッセージを、以下のキャラクター設定に従って、50文字前後で送ってください。\n【キャラクター設定】:${getCharacterPrompt(charType)}`;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${db.config.geminiApiKey}`;
-
-            for (let i = 0; i < 3; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { temperature: 0.95 }
-                        })
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                            db.nextAiMessage = data.candidates[0].content.parts[0].text.trim();
-                            localStorage.setItem('surv_db', JSON.stringify(db));
-                            return;
-                        }
-                    }
-                } catch (e) { /* 通信エラー時はリトライ */ }
-                await new Promise(r => setTimeout(r, 1500));
-            }
-            // 3回失敗したら空にしておく（次回表示時にgetFallbackMessageが呼ばれる）
-            db.nextAiMessage = '';
-            localStorage.setItem('surv_db', JSON.stringify(db));
-        }
-
-        // デバッグモード用：3回粘ってダメならデフォルト表示へ
-        async function testAiMessageDirectly() {
-            const aiMessage = document.getElementById('ai-message');
-            if (!db.config.geminiApiKey) {
-                aiMessage.innerHTML = "⚠️ <b>APIキー未設定</b>";
-                return;
-            }
-            aiMessage.innerHTML = "<span class='text-amber-400'>デバッグ：AI生成中...</span>";
-
-            const charType = db.config.aiCharacter || 'gentle_f';
-            const prompt = `仕事が本当に辛く、${db.config.title || '目標'}を楽しみに毎日耐えて生きている私に、今日を無事に生き延びたことを労うメッセージを、以下のキャラクター設定に従って、50文字前後で送ってください。\n【キャラクター設定】:${getCharacterPrompt(charType)}`;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${db.config.geminiApiKey}`;
-
-            for (let i = 0; i < 3; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { temperature: 0.95 }
-                        })
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                            aiMessage.innerHTML = `🛠️ <b>${data.candidates[0].content.parts[0].text.trim()}</b>`;
-                            return;
-                        }
-                    }
-                } catch (e) { }
-                await new Promise(r => setTimeout(r, 1500));
-            }
-            // 3回失敗時はデフォルトを表示
-            aiMessage.innerHTML = `🌟 <b>${getFallbackMessage()}</b> <span class='text-xs block text-slate-500'>(通信失敗のため、標準メッセージを表示しました)</span>`;
-        }
-
-        function toggleModal(show) {
-            const modal = document.getElementById('config-modal');
-            if (show) {
-                document.getElementById('input-title').value = db.config.title || '';
-                document.getElementById('input-date').value = db.config.targetDate || '';
-                document.getElementById('input-character').value = db.config.aiCharacter || 'gentle_f';
-                document.getElementById('input-key').value = db.config.geminiApiKey || '';
-                document.getElementById('input-debug').checked = db.config.debugMode || false;
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        function saveConfig() {
-            const oldKey = db.config.geminiApiKey;
-            const oldChar = db.config.aiCharacter;
-            const oldDebug = db.config.debugMode;
-
-            db.config.title = document.getElementById('input-title').value || "お盆休み！";
-            db.config.targetDate = document.getElementById('input-date').value;
-            db.config.aiCharacter = document.getElementById('input-character').value;
-            db.config.geminiApiKey = document.getElementById('input-key').value;
-            db.config.debugMode = document.getElementById('input-debug').checked;
-
-            localStorage.setItem('surv_db', JSON.stringify(db));
-            toggleModal(false);
-            
-            if (!db.config.debugMode && db.config.geminiApiKey && (db.config.geminiApiKey !== oldKey || db.config.aiCharacter !== oldChar || oldDebug !== db.config.debugMode)) {
-                preloadNextAiMessage();
-            }
-            
-            initApp();
-        }
+        initApp();
+      }
     </script>
-</body>
+  </body>
 </html>
